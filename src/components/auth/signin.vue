@@ -8,6 +8,7 @@
     <v-text-field
       label="Password"
       v-model="password"
+      type="password"
       :counter="10"
       required
     ></v-text-field>

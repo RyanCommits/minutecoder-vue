@@ -15,6 +15,7 @@
       v-validate="'required'"
       label="Password"
       type="password"
+      placeholder="Passwords should be at least 6 characters long"
       v-model="password"
       :counter="10"
       required
