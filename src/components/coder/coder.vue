@@ -49,12 +49,15 @@
       }),
       isMatch(node, key) {
         // if no nested span
-        if (node.children.length && node.children[0].innerHTML === key) {
+        if (node.children.length && node.children[0].innerHTML === key ) {
           return true;
         // if nested span
         } else if (!node.children.length && node.innerHTML === key) {
           return true;
+        } else if  (node.childNodes && node.innerText === key) {
+          return true;
         }
+
         return false;
       },
       isEnterKey(node, key) {

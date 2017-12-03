@@ -20,7 +20,6 @@ export default {
       returnSecureToken: true
     })
       .then(res => {
-        console.log(res);
         // the server responds back a data object with tokens
         commit(m.AUTH_USER, {
           token: res.data.idToken,
@@ -35,7 +34,6 @@ export default {
 
         userData[email] = {localId: res.data.localId, username: authData.username}
 
-        console.log(userData);
         // to store user data in Firebase database in addition to the Auth database
         dispatch(a.storeUser, userData)
       })

@@ -20,7 +20,6 @@ export default {
     state[s.codeId] = id;
   },
   [m.STORE_LANGUAGE](state, language) {
-    console.log(language, 'store language');
     state[s.language] = language;
   }
 };

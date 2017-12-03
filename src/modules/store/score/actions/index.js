@@ -6,8 +6,6 @@ import globalAxios from 'axios';
 export default {
 
   [a.saveScore]({state, commit, rootState}, score) {
-    console.log(rootState, 'rootState');
-    console.log(rootState.code.highscores);
 
     const token = rootState.auth.idToken;
     const highScoreArray = rootState.code.highscores;
@@ -32,9 +30,6 @@ export default {
         }
       }
     }
-
-    console.log(score);
-
     globalAxios.put(`/${language}/${score.codeId}/highscores.json?auth=${token}`, highScoreArray)
       .then((res) => {
         console.log(res, 'response');
