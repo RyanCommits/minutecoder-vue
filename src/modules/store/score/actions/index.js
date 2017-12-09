@@ -5,7 +5,7 @@ import globalAxios from 'axios';
 
 export default {
 
-  [a.saveScore]({state, commit, rootState}, score) {
+  [a.saveScore]({rootState}, score) {
 
     const token = rootState.auth.idToken;
     const highScoreArray = rootState.code.highscores;

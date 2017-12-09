@@ -96,12 +96,7 @@
       }
     },
     mounted() {
-
-      this.getCode(this.language.toLowerCase());
-
-      setTimeout(() => {
-        // creates an array of hljs DOM spans. They are by reference
-
+      this.getCode(this.language.toLowerCase()).then((resp) => {
         this.nodes = Array.prototype.slice.call(this.$refs.code.children);
 
         // add the active class to first character
@@ -143,7 +138,7 @@
           }
           return;
         });
-      }, 2000);
+      });
     },
     beforeDestroy() {
       this.stop();
