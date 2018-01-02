@@ -1,14 +1,17 @@
 <template>
-  <div id="coder">
+  <div id="coder" v-if="drawComponent">
     <!-- DOM renders only if code is received from server -->
     <div v-if="codeFromServer">
       <h2>{{language}} Snippet # {{codeId}}</h2>
       <pre v-highlightjs><code ref="code"><span class="code untouched" v-for="char in codeFromServer.code">{{ char }}</span></code></pre>
+      <!-- <pre v-highlightjs="codeFromServer.code"><code class="hljs javascript" ref="code"></code></pre> -->
     </div>
+    <button @click="reset()">Get New Code</button>
   </div>
 </template>
 
 <script>
+  import Vue from 'vue';
   import store from 'store';
   import timer from './timer.vue';
 
@@ -25,8 +28,8 @@
     data() {
       return {
         index: 0,
-        nodes: []
-        // code: null
+        nodes: [],
+        drawComponent: true
       };
     },
     computed: {
@@ -71,6 +74,61 @@
           this.index++;
           currentNode = this.nodes[this.index]
         }
+      },
+      setUpHighlight() {
+        this.getCode(this.language.toLowerCase()).then((resp) => {
+          this.nodes = Array.prototype.slice.call(this.$refs.code.children);
+
+          // add the active class to first character
+
+          this.nodes[0].classList.add('active');
+
+          // handle User typing
+
+          window.addEventListener('keypress', this.trackNode);
+        });
+      },
+      reset() {
+        // rebuilds DOM once code updates
+        this.drawComponent = false;
+        Vue.nextTick(() => {
+          this.index = 0;
+          this.setUpHighlight();
+          this.drawComponent = true;
+        });
+        window.removeEventListener('keypress', this.trackNode);
+      },
+      trackNode(event) {
+        const key = event.key;
+        const currentNode = this.nodes[this.index];
+        this.start();
+
+        // stop space bar from scrolling page
+        if (key === ' ') {
+          event.preventDefault();
+        }
+
+        // when user completes challenge
+        /////////////////////////////////////////
+        if (this.index === this.nodes.length - 1) {
+          this.stop();
+          currentNode.classList.remove('active');
+          currentNode.classList.remove('untouched');
+
+        /////////////////////////////////////////
+
+        } else if (this.isMatch(currentNode, key)) {
+          this.index++;
+        } else if (this.isEnterKey(currentNode, key)) {
+          currentNode.classList.remove('return');
+          this.index++;
+          currentNode.classList.add('active');
+          // indent tabbed spaces after line break
+          this.indent();
+        } else {
+          currentNode.classList.add('incorrect');
+        }
+        return;
       }
     },
     watch: {
@@ -96,49 +154,7 @@
       }
     },
     mounted() {
-      this.getCode(this.language.toLowerCase()).then((resp) => {
-        this.nodes = Array.prototype.slice.call(this.$refs.code.children);
-
-        // add the active class to first character
-
-        this.nodes[0].classList.add('active');
-
-        // handle User typing
-
-        window.addEventListener('keypress', (event) => {
-          const key = event.key;
-          const currentNode = this.nodes[this.index];
-
-          this.start();
-
-          // stop space bar from scrolling page
-          if (key === ' ') {
-            event.preventDefault();
-          }
-
-          // when user completes challenge
-          /////////////////////////////////////////
-          if (this.index === this.nodes.length - 1) {
-            this.stop();
-            currentNode.classList.remove('active');
-            currentNode.classList.remove('untouched');
-
-          /////////////////////////////////////////
-
-          } else if (this.isMatch(currentNode, key)) {
-            this.index++;
-          } else if (this.isEnterKey(currentNode, key)) {
-            currentNode.classList.remove('return');
-            this.index++;
-            currentNode.classList.add('active');
-            // indent tabbed spaces after line break
-            this.indent();
-          } else {
-            currentNode.classList.add('incorrect');
-          }
-          return;
-        });
-      });
+      this.setUpHighlight();
     },
     beforeDestroy() {
       this.stop();
